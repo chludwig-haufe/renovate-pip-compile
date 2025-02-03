@@ -1,0 +1,18 @@
+= Demo Readme
+// renovate: datasource=pypi depName=httpx
+:httpx-version: 0.28.0
+// renovate: datasource=pypi depName=pypiWheel packageName=wheel
+:wheel-version: 0.45.0
+
+[cols="2,2",options="header",]
+.Package Versions
+|===
+|Package
+|Version
+
+|httpx
+|{httpx-version}
+
+|wheel
+|{wheel-version}
+|===
