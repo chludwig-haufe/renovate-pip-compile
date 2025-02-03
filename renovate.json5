@@ -9,19 +9,7 @@
   "extends": [
     "config:base",
     ":disableRateLimiting",
-    "workarounds:all"
   ],
-
-  "lockFileMaintenance": {
-    "enabled": true,
-    "automerge": true,
-    "labels": [ "renovate", "lock file maintenance" ],
-    "schedule": [
-      "after 10pm every weekday",
-      "before 5am every weekday",
-      "every weekend"
-    ]
-  },
 
   "enabledManagers": [
     "pip-compile",
@@ -36,7 +24,7 @@
   },
 
   "constraints": {
-    "python": "3.12.7"
+    "python": "3.12.8"
   },
   "constraintsFiltering": "strict",
 

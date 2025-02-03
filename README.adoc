@@ -1,8 +1,25 @@
-= Demo Readme
+= Reproduction for Renovate Discussion
 // renovate: datasource=pypi depName=httpx
 :httpx-version: 0.28.0
 // renovate: datasource=pypi depName=pypiWheel packageName=wheel
 :wheel-version: 0.45.0
+
+== Current Behavior
+
+The file `requirements.in` contains three dependencies: aniso8601, httpx, and wheel.
+
+As far as RenovateBot is concerned, aniso8601 is not referenced anywhere else.
+As expected, the pip-compile manager creates a MR for aniso8601 that updates both `requirements.in` _and_ `requirements.txt`.
+
+httpx and wheel, on the other hand, are also referenced in `README.adoc` using the custom.regex manager.
+In the MRs generated for these two dependencies, the necessary update in `requirements.txt` has been lost;
+the MRs change `requirements.in` and `README.adoc` only.
+
+The wheel example demonstrates that this happens also if I assign a custom dependency name to the dependency in `README.adoc` and then explicitly group these dependencies together.
+
+== Expected Behavior
+
+The MRs for httpx and wheel contain the respective changes to `requirements.txt`.
 
 [cols="2,2",options="header",]
 .Package Versions
