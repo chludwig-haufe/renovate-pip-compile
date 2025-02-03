@@ -1,4 +1,4 @@
-= Reproduction for Renovate Discussion
+= Reproduction for Renovate Discussion https://github.com/renovatebot/renovate/discussions/34015[#34015]
 // renovate: datasource=pypi depName=httpx
 :httpx-version: 0.28.0
 // renovate: datasource=pypi depName=pypiWheel packageName=wheel
