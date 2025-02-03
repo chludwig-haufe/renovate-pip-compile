@@ -1,0 +1,124 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "baseBranches": [
+    "main",
+  ],
+
+  enabled: true,
+
+  "extends": [
+    "config:base",
+    ":disableRateLimiting",
+    "group:recommended",
+    "workarounds:all",
+  ],
+
+  "assignees": ["LudwigC"],
+
+  "major":  { "labels": [ "renovate", "major", ] },
+  "minor":  { "labels": [ "renovate", "minor", ] },
+  "patch":  { "labels": [ "renovate", "patch", ] },
+  "pin":    { "labels": [ "renovate", "pin", ] },
+  "digest": { "labels": [ "renovate", "digest", ] },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "labels": [ "renovate", "lock file maintenance", ],
+    "schedule": [
+      "after 10pm every weekday",
+      "before 5am every weekday",
+      "every weekend"
+    ],
+  },
+
+  "enabledManagers": [
+    "dockerfile",
+    "gitlabci-include",
+    "pip-compile",
+    "pre-commit",
+    "regex",
+  ],
+
+  // Apparently, "enabledManagers" above does _not_ enable the listed managers
+  // if they are disabled by default. It only _disables_ the ones that are not listed.
+  "pre-commit": {
+    "enabled": true,
+  },
+
+  "pip-compile": {
+    // From https://docs.renovatebot.com/modules/manager/pip-compile/:
+    // "pip-compile reads the output files to extract the arguments passed to the original
+    // command, as such the fileMatch must be configured for *.txt files and not *.in."
+    "fileMatch": ["(^|/)requirements(-\\w+)?\\.txt$"],
+  },
+
+  "regexManagers": [
+    {
+      "fileMatch": ["^.gitlab-ci.yml$", "(^|/)gitlab-ci-module.yml"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>\\S*?)\\s+depName=(?<depName>.*?)(\\s+packageName=(?<packageName>.*?))?(\\s+versioning=(?<versioning>.*?))?\\s*\\n\\s*(\\S+:\\s*)\"(?<currentValue>.*)\""
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "packageNameTemplate": "{{#if packageName}}{{{packageName}}}{{else}}{{{depName}}}{{/if}}"
+    },
+    {
+      "fileMatch": ["(^|/)README.adoc$"],
+      "matchStrings": [
+        "//\\s*renovate:\\s*datasource=(?<datasource>\\S*?)\\s+depName=(?<depName>.*?)(\\s+packageName=(?<packageName>.*?))?(\\s+versioning=(?<versioning>.*?))?\\s*\\n(:\\S+:\\s*)(?<currentValue>\\S*)\\s*(\\n|$)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}pep440{{/if}}",
+      "packageNameTemplate": "{{#if packageName}}{{{packageName}}}{{else}}{{{depName}}}{{/if}}"
+    },
+    {
+      "fileMatch": ["^renovate.json5$"],
+      "matchStrings": [
+        "//\\s*renovate:\\s*datasource=(?<datasource>\\S*?)\\s+depName=(?<depName>.*?)(\\s+packageName=(?<packageName>.*?))?(\\s+versioning=(?<versioning>.*?))?\\s*\\n(\\s*\\S+:\\s*)\"(?<currentValue>[^\"]*)\""
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "packageNameTemplate": "{{#if packageName}}{{{packageName}}}{{else}}{{{depName}}}{{/if}}"
+    },
+    {
+      "fileMatch": ["(^|/)Dockerfile[^/]*$"],
+      "matchStrings": [
+        "#\\s*syntax=(?<depName>.*):(?<currentValue>.*)",
+      ],
+      "datasourceTemplate": "docker",
+    },
+  ],
+
+  "constraints": {
+    // renovate: datasource=github-tags depName=python3.12 packageName=python/cpython versioning=pep440
+    "python": "3.12.7"
+  },
+  "constraintsFiltering": "strict",
+
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "python/cpython",
+      ],
+      "extractVersion": "^v(?<version>.+)$",
+      // The Python major version 3 corresponds more to an epoch in the semver sense.
+      // Accordingly, the Python minor versions should be treated as major semver versions.
+      "separateMinorPatch": true,
+      "major": {
+        "enabled": false
+      },
+      "minor": {
+        "enabled": false
+      },
+      "rebaseWhen" : "auto",
+    },
+    {
+      "excludePackagePatterns": [
+        "^registry.haufe.io/library/docker-images/ubuntu$",
+      ],
+      "matchPackagePatterns": [".*"],
+      "matchUpdateTypes": [
+        "digest", "pin" ,"patch", "minor"
+      ],
+      "automerge": true,
+      "rebaseWhen" : "auto",
+    },
+  ],
+}
